@@ -30,7 +30,7 @@ class Utility :
     
     @staticmethod
     def vertical_analysis(item , divider) :
-        return item/divider
+        return round((item/divider.values) * 100 , 2)
     
     @staticmethod
     def count_leading_space(s): 
@@ -75,7 +75,6 @@ class Utility :
             temp_df.loc[0:,start_col:] = temp_df.loc[0:,start_col:].applymap(Utility.get_share_price_in)
             total_equity_filter = temp_df[Utility.particulars].apply(lambda x: x.strip()).eq('Total Equity')
             total_equity_row = temp_df.loc[total_equity_filter,start_col:].index.values[0]
-            total_assets_filter = temp_df[Utility.particulars].apply(lambda x: x.strip()).eq('Total Assets')
             total_liabilities_filter = temp_df[Utility.particulars].apply(lambda x: x.strip()).eq('Total Liabilities')
             total_liabilities_row = temp_df.loc[total_liabilities_filter,start_col:].index.values[0]
             temp_df.loc[total_liabilities_filter,start_col:] = temp_df.loc[[total_equity_row,total_liabilities_row],start_col:].sum().values
@@ -88,17 +87,30 @@ class Utility :
             return temp_df
     
     @staticmethod
-    def get_va_df(df , start_col , type) :
-         print(start_col)
+    def get_va_df(df, type) :
          temp_df = None
          if type == 'income':
+              temp_df = pd.DataFrame(columns=df.columns)
               basic_eps_filter = df[Utility.particulars].eq('Basic EPS')
               basic_eps_pos = df[basic_eps_filter].index[0]
-              temp_df = pd.DataFrame(columns=df.columns)
-              temp_df[Utility.particulars] = temp_df.loc[0:basic_eps_pos - 1,Utility.particulars].copy()
+              temp_df[Utility.particulars] = df.loc[0:Utility.get_basic_eps_pos(df),Utility.particulars].copy()
               return temp_df
          elif type == 'balance' :
-              pass
+              bs_va_temp = df.loc[:Utility.get_bl_last_pos(df)]
+              bs_va_temp = pd.DataFrame(bs_va_temp)
+              filt = bs_va_temp[Utility.particulars].apply(Utility.count_leading_space).isin([0,4,8])
+              return pd.DataFrame(bs_va_temp[filt])
+         
+    @staticmethod
+    def get_basic_eps_pos(df) :
+            basic_eps_filter = df[Utility.particulars].eq('Basic EPS')
+            return df[basic_eps_filter].index[0] - 1
+    
+    @staticmethod
+    def get_bl_last_pos(df) :
+           balance_sheet_ha_results_till = df[Utility.particulars].apply(lambda x: x.strip()).eq('Non-Controlling/Minority Interests in Equity')
+           return df[balance_sheet_ha_results_till].index.values[0]
+         
            
         
 

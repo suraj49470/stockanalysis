@@ -1,6 +1,6 @@
 import pandas as pd
 from utility import Utility
-
+import time
 
 class StockBuilder:
     _horizontal = ['income', 'balance']
@@ -93,32 +93,86 @@ class StockBuilder:
 
 class Vertical(StockBuilder) :
 
-    def __init__(self) :
+    def __init__(self , sticker_name) :
+        super().__init__(sticker_name)
         self._va_income = None
         self._va_balance = None
-        self._va_cash = None
+    
+    def get_va_revenue(self) :
+        df = self.get_income_df()
+        total_revenue_filter = df[Utility.particulars].apply(lambda x: x.strip()).eq('Total Revenue')
+        return df.loc[total_revenue_filter,self.is_start_col:]
+        
+    def get_va_total_assets(self) :
+         df = self.get_balance_df()
+         total_assets_filter = df[Utility.particulars].apply(lambda x: x.strip()).eq('Total Assets')
+         return df.loc[total_assets_filter,self.is_start_col:]
 
     def get_va_income_df(self) :
-        print('Vertical.get_income')
         return self._va_income
-
-    def get_va_cash_df(self) :
-        print('Vertical.get_cash')
-        return self._va_cash
-
-    def get_va_balance_df(self) :
-        print('Vertical.get_balance')
-        return self._va_balance
-
+    
     def set_va_income_df(self) :
+        self.set_income_df()
         df = self.get_income_df()
         start_col = self.is_start_col
-        self._va_income = Utility.get_va_df(df ,start_col,'income')
+        self._va_income = Utility.get_va_df(df,'income')
+        revenue = self.get_va_revenue()
+        transformed_income_df = df.loc[:Utility.get_basic_eps_pos(df),start_col:]
+        self._va_income.loc[:Utility.get_basic_eps_pos(df),start_col:] = Utility.vertical_analysis(transformed_income_df,revenue)
+        self._va_income.reset_index(drop=True , inplace=True)
+
+    def get_va_balance_df(self) :
+        return self._va_balance
 
     def set_va_balance_df(self) :
-        pass
+        self.set_balance_df()
+        df = self.get_balance_df()
+        start_col = self.bs_start_col
+        self._va_balance = Utility.get_va_df(df,'balance')
+        total_assets = self.get_va_total_assets()
+        self._va_balance.loc[:,start_col:] =  Utility.vertical_analysis(self._va_balance.loc[:,start_col:],total_assets)
+        self._va_balance.reset_index(drop=True , inplace=True)
 
-    def set_va_cash_df(self) :
-        pass
+
+class Horizontal(StockBuilder) :
+    def __init__(self , sticker_name) :
+        super().__init__(sticker_name)
+        self._ha_income = None
+        self._ha_balance = None
+        self._ha_cash = None
+
+    def get_ha_income(self) :
+        print('Horizontal.get_income')
+        return self.get_income_df()
+
+    def set_ha_income(self) :
+        self.set_income_df()
+        df = self.get_income_df()
+        start_col = self.is_start_col
+        print('Horizontal.set_income')
+        
+    def get_ha_balance(self) :
+        print('Horizontal.get_balance')
+
+    def set_ha_balance(self) :
+        print('Horizontal.set_balance')
+
+    def get_ha_cash(self) :
+        print('Horizontal.get_cash')
+
+    def set_ha_cash(self) :
+        print('Horizontal.set_cash')           
+
+start_time = time.time()       
+va = Vertical('mastek')
+va.set_va_income_df()
+print(va.get_va_income_df())
+
+va.set_va_balance_df()
+print(va.get_va_balance_df())
+
+ha = Horizontal('mastek')
+print(ha.get_ha_income())
+print("--- %s seconds ---" % (time.time() - start_time))
 
 
