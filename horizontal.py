@@ -24,6 +24,7 @@ class Horizontal(StockBuilder) :
                 prevColumn = df.columns[index-1]
                 self._ha_income.loc[temp_ha_filt,column] = Utility.calculate_growth_series(df.loc[temp_ha_filt,column],df.loc[temp_ha_filt,prevColumn])
         self._ha_income = self._ha_income[temp_ha_filt]
+        self._ha_income.reset_index(inplace=True,drop=True) 
                 
               
     def get_ha_balance(self) :
@@ -42,6 +43,7 @@ class Horizontal(StockBuilder) :
                 prevColumn = self._ha_balance.columns[index-1]
                 self._ha_balance.loc[:,column] = Utility.calculate_growth_series(df.loc[:,column],df.loc[:,prevColumn])
         self._ha_balance[self.bs_start_col] = 0.0
+        self._ha_balance.reset_index(inplace=True,drop=True) 
 
                     
 
@@ -62,3 +64,4 @@ class Horizontal(StockBuilder) :
                 prevColumn = self._ha_cash.columns[index-1]
                 self._ha_cash.loc[:,column] = Utility.calculate_growth_series(cash_flow_stmt_ha_temp.loc[:,column],cash_flow_stmt_ha_temp.loc[:,prevColumn])
         self._ha_cash[self.cf_start_col] = 0.0
+        self._ha_cash.reset_index(inplace=True,drop=True) 

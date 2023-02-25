@@ -151,8 +151,15 @@ class Utility :
               temp_balance = None
               return temp_df
          elif type == 'cash' :
-              
+              temp_df = pd.DataFrame(columns=df.columns)
+              temp_df[Utility.particulars] = df[Utility.particulars]
+              temp_df[start_col] = 0
               return temp_df
+    
+    @staticmethod
+    def get_df_items(df , key_name , start_col) :
+         filter = df[Utility.particulars].apply(lambda x: x.strip().lower()).eq(key_name)
+         return df.loc[filter,start_col:].copy()
 
 
     
