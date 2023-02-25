@@ -11,13 +11,13 @@ class Utility :
             return 0
         if current != 0 and previous == 0 :
             return current / 100
-        return ((current/previous) - 1)
+        return ((current/previous) - 1) * 100
     
     @staticmethod
     def calculate_growth_series(curr_df,prev_df):
         temp_df = curr_df.copy()
         for index in curr_df.index :
-            temp_df.loc[index] = Utility.calculate_growth(curr_df.loc[index],prev_df[index])
+            temp_df.loc[index] = round(Utility.calculate_growth(curr_df.loc[index],prev_df[index]),2)
         return temp_df
     
     @staticmethod
@@ -51,6 +51,16 @@ class Utility :
                                 ("font-weight", '600'),
                                 ("text-transform", 'uppercase')
                                 ])]
+    
+    @staticmethod
+    def get_basic_eps_pos(df) :
+            basic_eps_filter = df[Utility.particulars].eq('Basic EPS')
+            return df[basic_eps_filter].index[0] - 1
+    
+    @staticmethod
+    def get_bl_last_pos(df) :
+           balance_sheet_ha_results_till = df[Utility.particulars].apply(lambda x: x.strip()).eq('Non-Controlling/Minority Interests in Equity')
+           return df[balance_sheet_ha_results_till].index.values[0]
     
     @staticmethod
     def transform_income(income_statement , start_col) :
@@ -100,16 +110,52 @@ class Utility :
               bs_va_temp = pd.DataFrame(bs_va_temp)
               filt = bs_va_temp[Utility.particulars].apply(Utility.count_leading_space).isin([0,4,8])
               return pd.DataFrame(bs_va_temp[filt])
+              
          
+
     @staticmethod
-    def get_basic_eps_pos(df) :
-            basic_eps_filter = df[Utility.particulars].eq('Basic EPS')
-            return df[basic_eps_filter].index[0] - 1
+    def get_ha_df(df, type) :
+         temp_df = None
+         if type == 'income':
+                temp_df=  pd.DataFrame(columns= df.columns)
+                temp_df[Utility.particulars] = df[Utility.particulars]
+                temp_df.fillna(0 , inplace=True)
+                return temp_df
+         elif type == 'balance' :
+              temp_df = df.loc[:Utility.get_bl_last_pos(df)]
+              temp_df = pd.DataFrame(temp_df)
+              filt = temp_df[Utility.particulars].apply(Utility.count_leading_space).isin([0,4,8])
+              temp_df = pd.DataFrame(temp_df[filt])
+              return temp_df
+         elif type == 'cash' :
+              cashflow_statement_filt = df[Utility.particulars].apply(Utility.count_leading_space).isin([0,8,12])
+              temp_df = pd.DataFrame(df[cashflow_statement_filt])
+              temp_df.reset_index(inplace=True, drop=True)
+              return temp_df
+
+    @staticmethod
+    def get_trend_df(df, start_col, type) :
+         temp_df = None
+         if type == 'income':
+                temp_df = pd.DataFrame(columns=df.columns)
+                temp_df[Utility.particulars] = df[Utility.particulars]
+                temp_df[start_col] = 0
+                temp_df.fillna(0,inplace=True)
+                return temp_df
+         elif type == 'balance' :
+              temp_balance = df.loc[:Utility.get_bl_last_pos(df)]
+              temp_df = pd.DataFrame(columns=temp_balance.columns)
+              temp_df[Utility.particulars] = temp_balance[Utility.particulars]
+              temp_df[start_col] = 0
+              temp_df.fillna(0,inplace=True)
+              temp_balance = None
+              return temp_df
+         elif type == 'cash' :
+              
+              return temp_df
+
+
     
-    @staticmethod
-    def get_bl_last_pos(df) :
-           balance_sheet_ha_results_till = df[Utility.particulars].apply(lambda x: x.strip()).eq('Non-Controlling/Minority Interests in Equity')
-           return df[balance_sheet_ha_results_till].index.values[0]
          
            
         
