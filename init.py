@@ -47,10 +47,11 @@ def init_reports(company) :
     turnover = Turnover(company)
     print(turnover.get_turnover_df())
     print(turnover.get_turnover_days_df())
+    print(turnover.get_cash_conversion_cycle())
 
 
 
 
 start_time = time.time()
-init_reports('tvs')
+init_reports('tcs')
 print("--- %s seconds ---" % (time.time() - start_time))

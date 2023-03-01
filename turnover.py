@@ -76,6 +76,13 @@ class Turnover(StockBuilder) :
                 inv_mean = invetories.iloc[:,i-2:i].mean(axis=1)
                 self._turnover_ratio.loc[1:1,column] = Utility.calculate_ratio(cogs.loc[:,column],inv_mean).values
 
+    def get_cash_conversion_cycle(self) :
+        start_column = self.get_turnover_days_df().columns[1]
+        receivable_days = Utility.get_df_items(self.get_turnover_days_df(),'Receivable turnover days',start_column)
+        inventory_days = Utility.get_df_items(self.get_turnover_days_df(),'Inventory turnover days',start_column).replace({'-' : 0})
+        payable_days = Utility.get_df_items(self.get_turnover_days_df(),'Payables turnover days',start_column)
+        ccy = inventory_days + receivable_days - payable_days
+        return pd.DataFrame(ccy) 
 
     
     
