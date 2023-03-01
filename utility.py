@@ -158,8 +158,24 @@ class Utility :
     
     @staticmethod
     def get_df_items(df , key_name , start_col) :
-         filter = df[Utility.particulars].apply(lambda x: x.strip().lower()).eq(key_name)
-         return df.loc[filter,start_col:].copy()
+        filter = df[Utility.particulars].apply(lambda x: x.strip().lower()).eq(key_name.lower())
+        temp_df = pd.DataFrame(df.loc[filter,start_col:])
+        temp_df.reset_index(drop=True,inplace=True) 
+        return temp_df
+    
+    @staticmethod 
+    def get_invetory(df , key_name , start_col) :
+         invetories = Utility.get_df_items(df,key_name,start_col)
+         if len(invetories.value_counts().values) == 0 :
+            data = [[0] * len(invetories.columns)]
+            invetories = pd.DataFrame(data=data , columns=invetories.columns)
+         return invetories
+    
+    @staticmethod
+    def days_turnover(ratio) :
+        if ratio == '-' :
+            return '-'
+        return round((365 / ratio),2)
 
 
     

@@ -4,9 +4,11 @@ from horizontal import Horizontal
 from vertical import Vertical
 from trend import Trend
 from solvency import Solvency
+from turnover import Turnover
 import time
 
 def init_reports(company) :
+
     va = Vertical(company)
     va.set_va_income_df()
     print(va.get_va_income_df())
@@ -42,12 +44,13 @@ def init_reports(company) :
     sl.set_cash_ratio()
     print(sl.get_solvency())
 
+    turnover = Turnover(company)
+    print(turnover.get_turnover_df())
+    print(turnover.get_turnover_days_df())
+
 
 
 
 start_time = time.time()
-init_reports('mastek')
-
-      
-
+init_reports('tvs')
 print("--- %s seconds ---" % (time.time() - start_time))
