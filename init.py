@@ -5,6 +5,8 @@ from vertical import Vertical
 from trend import Trend
 from solvency import Solvency
 from turnover import Turnover
+from efficiency import Efficiency
+from profitability import Profitability
 import time
 
 def init_reports(company) :
@@ -48,6 +50,15 @@ def init_reports(company) :
     print(turnover.get_turnover_df())
     print(turnover.get_turnover_days_df())
     print(turnover.get_cash_conversion_cycle())
+
+    efficiency = Efficiency(company)
+    efficiency.set_efficiency_df()
+    print(efficiency.get_efficiency_df())
+
+    profitability = Profitability(company)
+    profitability.set_profitability_df()
+    profitability.set_profitablity_ratio()
+    print(profitability.get_profitability_df())
 
 
 

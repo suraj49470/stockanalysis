@@ -39,7 +39,8 @@ class Turnover(StockBuilder) :
        total_revenue = Utility.get_df_items(self.get_income_df(),'Total Revenue' , self.is_start_col,)
        for i , column in enumerate(self.get_balance_df().columns):
             if i > 1 :
-                ar_mean = account_receivables.iloc[:,i-2:i].mean(axis=1)
+                prevColumn = self.get_balance_df().columns[i - 1]
+                ar_mean = account_receivables.loc[:,prevColumn:column].mean(axis=1)
                 self._turnover_ratio.loc[0:0,column] = Utility.calculate_ratio(total_revenue.loc[:,column],ar_mean).values
 
     def get_puchase(self) :
@@ -61,7 +62,8 @@ class Turnover(StockBuilder) :
         purchases = self.get_puchase()
         for i , column in enumerate(self.get_balance_df().columns):
             if i > 1 :
-                ap_mean = account_payables.iloc[:,i-2:i].mean(axis=1)
+                prevColumn = self.get_balance_df().columns[i - 1]
+                ap_mean = account_payables.loc[:,prevColumn:column].mean(axis=1)
                 self._turnover_ratio.loc[2:2,column] = Utility.calculate_ratio(purchases.loc[:,column],ap_mean).values
     
     def set_invetories_turnover(self) :
@@ -73,7 +75,8 @@ class Turnover(StockBuilder) :
                 self._turnover_ratio.loc[1:1,self.bs_start_col:] = '-'
                 break
             elif i > 1 :
-                inv_mean = invetories.iloc[:,i-2:i].mean(axis=1)
+                prevColumn = self.get_balance_df().columns[i - 1]
+                inv_mean = invetories.loc[:,prevColumn:column].mean(axis=1)
                 self._turnover_ratio.loc[1:1,column] = Utility.calculate_ratio(cogs.loc[:,column],inv_mean).values
 
     def get_cash_conversion_cycle(self) :

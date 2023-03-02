@@ -33,6 +33,10 @@ class Utility :
         return round((item/divider.values) * 100 , 2)
     
     @staticmethod
+    def get_ratio(item , divider) :
+        return round((item/divider.values) * 100 , 2)
+    
+    @staticmethod
     def count_leading_space(s): 
         match = re.search(r"^\s*", s) 
         return 0 if not match else match.end()
